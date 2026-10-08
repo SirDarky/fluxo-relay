@@ -1,0 +1,219 @@
+{
+  "run_id": "qs7znoyhg73489a1etla9ku4",
+  "attempt": 1,
+  "result": [
+    {
+      "seq": 0,
+      "sku": "b075yjp2omqh2wqv5r3135e3",
+      "price": 1793.89,
+      "stock": 210
+    },
+    {
+      "seq": 1,
+      "sku": "lor226x3cw6y3w5lhceef038",
+      "price": 862.33,
+      "stock": 352
+    },
+    {
+      "seq": 2,
+      "sku": "iggf80psgqcoqn7u2e955f2a",
+      "price": 2313.93,
+      "stock": 500
+    },
+    {
+      "seq": 3,
+      "sku": "c4o0jsd8kap7z6sfti39cvjr",
+      "price": 1588.6,
+      "stock": 133
+    },
+    {
+      "seq": 4,
+      "sku": "lvj47z6c918i841d878i205w",
+      "price": 1597.76,
+      "stock": 405
+    },
+    {
+      "seq": 5,
+      "sku": "ndb99pq4e14es8k42i3tmihq",
+      "price": 171.77,
+      "stock": 266
+    },
+    {
+      "seq": 6,
+      "sku": "yp39fspwb0rxbkrre9haf1r6",
+      "price": 858.92,
+      "stock": 272
+    },
+    {
+      "seq": 7,
+      "sku": "uh8v65v87mjdi10fa0mknykw",
+      "price": 1351.18,
+      "stock": 358
+    },
+    {
+      "seq": 8,
+      "sku": "ruzklnt0avd9henhzg7exn6l",
+      "price": 524.67,
+      "stock": 22
+    },
+    {
+      "seq": 9,
+      "sku": "qxuqns23ij3xwixjyvv1o1ue",
+      "price": 2361.13,
+      "stock": 285
+    },
+    {
+      "seq": 10,
+      "sku": "obpvl0pywhiah3wa5wtr30zg",
+      "price": 1976.29,
+      "stock": 74
+    },
+    {
+      "seq": 11,
+      "sku": "z4vaprl3hqcwgm2vuy5h4zca",
+      "price": 1185.06,
+      "stock": 118
+    },
+    {
+      "seq": 12,
+      "sku": "uncv317zew9bt53d1gbwfvqy",
+      "price": 559.48,
+      "stock": 137
+    },
+    {
+      "seq": 13,
+      "sku": "urg3l6vg3b4p7isyixr9ndxn",
+      "price": 2083.17,
+      "stock": 52
+    },
+    {
+      "seq": 14,
+      "sku": "dtq848skzkpq4v7x70tsqarm",
+      "price": 1919,
+      "stock": 180
+    },
+    {
+      "seq": 15,
+      "sku": "cv8xs87mrl71d0mby7uii521",
+      "price": 982.28,
+      "stock": 266
+    },
+    {
+      "seq": 16,
+      "sku": "haxtzb3cildscpzuu50prxes",
+      "price": 1940.73,
+      "stock": 168
+    },
+    {
+      "seq": 17,
+      "sku": "vh266sy7b4ieq6a8vs0q8rsv",
+      "price": 2097.48,
+      "stock": 443
+    },
+    {
+      "seq": 18,
+      "sku": "q8k5kvr5mykgouyl7a09oo6b",
+      "price": 472.65,
+      "stock": 346
+    },
+    {
+      "seq": 19,
+      "sku": "xdp2224hqrzttccr7iw0e2m6",
+      "price": 2303.44,
+      "stock": 139
+    }
+  ],
+  "http_status": 200,
+  "response": {
+    "ok": true,
+    "ack": {
+      "p50": 310,
+      "p95": 546,
+      "pass": true,
+      "worst": {
+        "ms": 562,
+        "seq": 12
+      },
+      "failed": [],
+      "measured": 20,
+      "target_ms": 600,
+      "warmup_ms": 276,
+      "over_target": []
+    },
+    "retry": {
+      "pass": true,
+      "recovered": 1,
+      "forced_500": 1,
+      "skus_with_500": 1
+    },
+    "score": 100,
+    "result": {
+      "pass": true,
+      "matched": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "missing": [],
+      "unknown": [],
+      "expected": 20,
+      "mismatched": []
+    },
+    "attempt": 1,
+    "breakdown": {
+      "ack": {
+        "earned": 30,
+        "weight": 30
+      },
+      "retry": {
+        "earned": 15,
+        "weight": 15
+      },
+      "result": {
+        "earned": 30,
+        "weight": 30
+      },
+      "concurrency": {
+        "earned": 10,
+        "weight": 10
+      },
+      "idempotency": {
+        "earned": 15,
+        "weight": 15
+      }
+    },
+    "concurrency": {
+      "pass": true,
+      "limit": 3,
+      "got_429": 0,
+      "skus_stuck_after_429": []
+    },
+    "duration_ms": 2412,
+    "idempotency": {
+      "pass": true,
+      "enrich_calls": 1,
+      "duplicate_seq": 3,
+      "duplicate_sku": "c4o0jsd8kap7z6sfti39cvjr",
+      "expected_calls": 1
+    }
+  },
+  "started_at": "2026-10-06T09:42:47.029Z",
+  "finished_at": "2026-10-06T09:42:47.259Z"
+}

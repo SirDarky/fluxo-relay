@@ -1,0 +1,156 @@
+name: fluxo-relay
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?Configure o .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Configure o .env}
+      POSTGRES_DB: ${POSTGRES_DB:?Configure o .env}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    ports:
+      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build: .
+    image: fluxo-relay-app:local
+    init: true
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      API_PORT: 4000
+      PGHOST: postgres
+      PGPORT: 5432
+      PGUSER: ${POSTGRES_USER:?Configure o .env}
+      PGPASSWORD: ${POSTGRES_PASSWORD:?Configure o .env}
+      PGDATABASE: ${POSTGRES_DB:?Configure o .env}
+      REDIS_URL: redis://redis:6379
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      PLATFORM_BASE_URL: ${PLATFORM_BASE_URL:-https://dev-wdu-ped-test-1014944555984.us-central1.run.app}
+      PROCESSING_ENABLED: ${PROCESSING_ENABLED:-false}
+      SIMULATION_ENABLED: ${SIMULATION_ENABLED:-true}
+      DASHBOARD_TOKEN: ${DASHBOARD_TOKEN:-}
+    ports:
+      - "127.0.0.1:${API_PORT:-4000}:4000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4000/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  webhook:
+    build: .
+    image: fluxo-relay-app:local
+    init: true
+    restart: unless-stopped
+    command: ["node", "dist/webhook/main.js"]
+    environment:
+      HOST: 0.0.0.0
+      WEBHOOK_PORT: 4100
+      WEBHOOK_UPSTREAM: http://api:4000
+    ports:
+      - "127.0.0.1:4100:4100"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4100/check',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({token:'health'})}).then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  worker:
+    build: .
+    image: fluxo-relay-app:local
+    init: true
+    restart: unless-stopped
+    stop_grace_period: 30s
+    command: ["node", "dist/worker/main.js"]
+    environment:
+      NODE_ENV: production
+      PGHOST: postgres
+      PGPORT: 5432
+      PGUSER: ${POSTGRES_USER:?Configure o .env}
+      PGPASSWORD: ${POSTGRES_PASSWORD:?Configure o .env}
+      PGDATABASE: ${POSTGRES_DB:?Configure o .env}
+      REDIS_URL: redis://redis:6379
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      PLATFORM_BASE_URL: ${PLATFORM_BASE_URL:-https://dev-wdu-ped-test-1014944555984.us-central1.run.app}
+      PROCESSING_ENABLED: ${PROCESSING_ENABLED:-false}
+      SIMULATION_ENABLED: ${SIMULATION_ENABLED:-true}
+      SIMULATOR_BASE_URL: http://simulator:4300
+      RETRY_MAX_ATTEMPTS: ${RETRY_MAX_ATTEMPTS:-8}
+      RETRY_BASE_DELAY_MS: ${RETRY_BASE_DELAY_MS:-500}
+      RETRY_MAX_DELAY_MS: ${RETRY_MAX_DELAY_MS:-30000}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      simulator:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "dist/worker/healthcheck.js"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  tunnel:
+    profiles: ["tunnel"]
+    image: cloudflare/cloudflared:2026.10.0
+    restart: unless-stopped
+    command: ["tunnel", "--no-autoupdate", "--url", "http://webhook:4100", "--protocol", "http2"]
+    depends_on:
+      webhook:
+        condition: service_healthy
+
+  simulator:
+    build: .
+    image: fluxo-relay-app:local
+    init: true
+    command: ["node", "dist/simulator/main.js"]
+    restart: unless-stopped
+    environment:
+      HOST: 0.0.0.0
+      SIMULATOR_PORT: 4300
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4300/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  postgres_data:
+    name: ${POSTGRES_VOLUME_NAME:-fluxo-relay-postgres}
+  redis_data:
+    name: ${REDIS_VOLUME_NAME:-fluxo-relay-redis}

@@ -1,0 +1,56 @@
+{
+  "name": "fluxo-relay",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "dev": "npm run dev:api",
+    "dev:api": "tsx watch --env-file=.env src/api/main.ts",
+    "dev:worker": "tsx watch --env-file=.env src/worker/main.ts",
+    "dev:web": "npm --prefix web run dev",
+    "dev:simulator": "tsx --env-file=.env src/simulator/main.ts",
+    "build:web": "npm --prefix web run build",
+    "typecheck:web": "npm --prefix web run typecheck",
+    "build": "tsc -p tsconfig.json",
+    "start": "npm run start:api",
+    "start:api": "node --env-file=.env dist/api/main.js",
+    "start:worker": "node --env-file=.env dist/worker/main.js",
+    "typecheck": "tsc -p tsconfig.check.json",
+    "verify": "tsx --env-file=.env scripts/verify.ts",
+    "test:api": "tsx --env-file=.env --test tests/api.test.ts",
+    "test:worker": "tsx --env-file=.env --test tests/worker.test.ts",
+    "test:dashboard": "tsx --env-file=.env --test tests/dashboard.test.ts",
+    "test:retry": "tsx --test tests/retry.test.ts",
+    "test:webhook": "tsx --test tests/webhook.test.ts",
+    "test:board": "tsx --test tests/processing-stage.test.ts",
+    "test": "npm run test:board && npm run test:retry && npm run test:webhook && npm run test:api && npm run test:worker && npm run test:dashboard",
+    "db:migrate": "tsx --env-file=.env scripts/migrate.ts",
+    "integration:register": "tsx --env-file=.env scripts/register.ts",
+    "integration:burst": "tsx --env-file=.env scripts/burst.ts",
+    "integration:status": "tsx --env-file=.env scripts/status.ts",
+    "integration:report": "tsx --env-file=.env scripts/report.ts",
+    "integration:tunnel": "docker compose --profile tunnel up -d tunnel",
+    "integration:tunnel:stop": "docker compose stop tunnel",
+    "docker:up": "docker compose up -d --build --wait",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f"
+  },
+  "dependencies": {
+    "@fastify/static": "^10.1.5",
+    "@fastify/websocket": "^11.3.3",
+    "bullmq": "^5.81.5",
+    "fastify": "^5.12.5",
+    "ioredis": "^5.11.1",
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.1",
+    "@types/pg": "^8.23.1",
+    "@types/ws": "^8.18.2",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3"
+  }
+}

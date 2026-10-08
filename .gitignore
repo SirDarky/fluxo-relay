@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+tmp/
+*.log
+coverage/
+*.pdf
+# Publicar apenas a execução real e a imagem de apresentação.
+output/*
+!output/reports/
+output/reports/*
+!output/reports/execucao-real.json
+!output/quadros-processamento.jpg
